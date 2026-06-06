@@ -22,7 +22,7 @@
 
 | カテゴリ | スクリプト | 説明 | インストール |
 |---------|-----------|------|------------|
-| シフト | シフトセル インライン編集 | シフト設定画面の各セルをプルダウンで直接変更 | [![Install](https://img.shields.io/badge/install-green)](https://raw.githubusercontent.com/catdance124/tm-salon-board/main/shift-inline-edit.user.js) |
+| シフト | [シフトセル インライン編集](#シフトセル-インライン編集) | シフト設定画面の各セルをプルダウンで直接変更 | [![Install](https://img.shields.io/badge/install-green)](https://raw.githubusercontent.com/catdance124/tm-salon-board/main/shift-inline-edit.user.js) |
 
 ---
 
