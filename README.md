@@ -20,13 +20,18 @@
 
 ## スクリプト一覧
 
+| カテゴリ | スクリプト | 説明 | インストール |
+|---------|-----------|------|------------|
+| シフト | シフトセル インライン編集 | シフト設定画面の各セルをプルダウンで直接変更 | [![Install](https://img.shields.io/badge/install-green)](https://raw.githubusercontent.com/catdance124/tm-salon-board/main/shift-inline-edit.user.js) |
+
+---
+
 ### シフト
 
 #### シフトセル インライン編集
-
 [![Install](https://img.shields.io/badge/TamperMonkey-Install-green)](https://raw.githubusercontent.com/catdance124/tm-salon-board/main/shift-inline-edit.user.js)
 
-シフト設定画面（`/KLP/set/shiftSetup/`）の各セルをクリックするとプルダウンが表示され、モーダルを開かずにシフトを直接変更できる。
+シフト設定画面の各セルをクリックするとプルダウンが表示され、モーダルを開かずにシフトを直接変更できる。
 
 | 操作 | 動作 |
 |------|------|
