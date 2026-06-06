@@ -20,7 +20,9 @@
 
 ## スクリプト一覧
 
-### シフトセル インライン編集
+### シフト
+
+#### シフトセル インライン編集
 
 [![Install](https://img.shields.io/badge/TamperMonkey-Install-green)](https://raw.githubusercontent.com/catdance124/tm-salon-board/main/shift-inline-edit.user.js)
 
