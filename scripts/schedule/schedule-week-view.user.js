@@ -217,11 +217,11 @@
   }
 
   function updateWeekLabel() {
-    const label = weekPanelEl?.querySelector('.tm-week-label');
-    if (!label) return;
+    if (!weekPanelEl) return;
     const end = new Date(currentMonday);
     end.setDate(end.getDate() + 6);
-    label.textContent = `${currentMonday.getMonth() + 1}/${currentMonday.getDate()} 〜 ${end.getMonth() + 1}/${end.getDate()}`;
+    const text = `${currentMonday.getMonth() + 1}/${currentMonday.getDate()} 〜 ${end.getMonth() + 1}/${end.getDate()}`;
+    weekPanelEl.querySelectorAll('.tm-week-label').forEach(el => { el.textContent = text; });
   }
 
   function shiftWeek(delta) {
@@ -231,68 +231,40 @@
     loadAndRender();
   }
 
-  function createWeekPanel(insertBefore) {
-    const panel = document.createElement('div');
-    panel.id = 'tm-week-panel';
-    panel.style.cssText = 'background:#fff;border:1px solid #c8d6e5;border-radius:4px;margin:6px 0 8px;box-shadow:0 2px 8px rgba(0,0,0,0.12);overflow:hidden;';
-
-    panel.innerHTML = `
-      <div style="background:#4a86c8;color:#fff;padding:7px 12px;display:flex;align-items:center;gap:10px;user-select:none;">
-        <span style="font-weight:bold;font-size:13px;">週表示</span>
-        <button class="tm-week-prev" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;padding:3px 10px;border-radius:3px;cursor:pointer;font-size:12px;">◀ 前週</button>
-        <span class="tm-week-label" style="font-size:13px;min-width:130px;text-align:center;"></span>
-        <button class="tm-week-next" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;padding:3px 10px;border-radius:3px;cursor:pointer;font-size:12px;">次週 ▶</button>
-        <span style="flex:1;"></span>
-        <button class="tm-week-close" style="background:transparent;border:none;color:#fff;cursor:pointer;font-size:18px;line-height:1;padding:0 2px;" title="閉じる">×</button>
-      </div>
-      <div class="tm-week-body"></div>
-    `;
-
-    panel.querySelector('.tm-week-prev').addEventListener('click', () => shiftWeek(-1));
-    panel.querySelector('.tm-week-next').addEventListener('click', () => shiftWeek(1));
-    panel.querySelector('.tm-week-close').addEventListener('click', () => {
-      panel.remove();
-      weekPanelEl = null;
-      const btn = document.getElementById('tm-week-toggle');
-      if (btn) btn.textContent = '週表示';
-    });
-
-    insertBefore.parentElement.insertBefore(panel, insertBefore);
-    return panel;
+  function navBarHTML() {
+    return `<div style="background:#4a86c8;color:#fff;padding:7px 12px;display:flex;align-items:center;gap:10px;user-select:none;">
+      <span style="font-weight:bold;font-size:13px;">週表示</span>
+      <button class="tm-week-prev" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;padding:3px 10px;border-radius:3px;cursor:pointer;font-size:12px;">◀ 前週</button>
+      <span class="tm-week-label" style="font-size:13px;min-width:130px;text-align:center;"></span>
+      <button class="tm-week-next" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;padding:3px 10px;border-radius:3px;cursor:pointer;font-size:12px;">次週 ▶</button>
+    </div>`;
   }
 
-  function addWeekViewButton() {
-    const calPager = document.querySelector('.scheduleCalenderPager');
-    if (!calPager) {
-      console.warn('[tm-schedule-week] .scheduleCalenderPager が見つかりません');
-      return;
-    }
+  function createWeekPanel(insertAfter) {
+    const panel = document.createElement('div');
+    panel.id = 'tm-week-panel';
+    panel.style.cssText = 'background:#fff;border:1px solid #c8d6e5;border-radius:4px;margin:8px 0;box-shadow:0 2px 8px rgba(0,0,0,0.12);overflow:hidden;';
 
-    const btn = document.createElement('button');
-    btn.id = 'tm-week-toggle';
-    btn.textContent = '週表示';
-    btn.style.cssText = 'background:#4a86c8;color:#fff;border:none;border-radius:3px;padding:5px 12px;cursor:pointer;font-size:12px;font-weight:bold;margin-right:8px;vertical-align:middle;';
+    panel.innerHTML = `
+      ${navBarHTML()}
+      <div class="tm-week-body"></div>
+      ${navBarHTML()}
+    `;
 
-    btn.addEventListener('click', () => {
-      if (weekPanelEl) {
-        weekPanelEl.remove();
-        weekPanelEl = null;
-        btn.textContent = '週表示';
-        return;
-      }
-      currentMonday = getWeekMonday(getCurrentDate());
-      weekPanelEl = createWeekPanel(calPager);
-      btn.textContent = '週表示を閉じる';
-      loadAndRender();
-    });
+    panel.querySelectorAll('.tm-week-prev').forEach(btn => btn.addEventListener('click', () => shiftWeek(-1)));
+    panel.querySelectorAll('.tm-week-next').forEach(btn => btn.addEventListener('click', () => shiftWeek(1)));
 
-    calPager.parentElement.insertBefore(btn, calPager);
+    insertAfter.insertAdjacentElement('afterend', panel);
+    return panel;
   }
 
   function waitAndRun(retries = 20) {
     const ready = document.querySelector('.scheduleCalenderPager') && document.getElementById('date')?.value;
     if (ready) {
-      addWeekViewButton();
+      const calPager = document.querySelector('.scheduleCalenderPager');
+      currentMonday = getWeekMonday(getCurrentDate());
+      weekPanelEl = createWeekPanel(calPager);
+      loadAndRender();
       console.log('[tm-schedule-week] 初期化完了');
     } else if (retries > 0) {
       setTimeout(() => waitAndRun(retries - 1), 300);
