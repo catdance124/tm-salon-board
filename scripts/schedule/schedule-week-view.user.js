@@ -188,6 +188,12 @@
         </tr>
       </thead>
       <tbody>${rows}</tbody>
+      <tfoot>
+        <tr>
+          <th style="padding:6px 8px;background:#e8e8e8;border:1px solid #d0d0d0;"></th>
+          ${staffHeaders}
+        </tr>
+      </tfoot>
     </table>`;
   }
 
