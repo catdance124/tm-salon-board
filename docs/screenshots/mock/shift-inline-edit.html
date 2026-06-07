@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>サロンボード - シフト設定</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Meiryo", "メイリオ", sans-serif; font-size: 12px; background: #f0f4f8; color: #333; }
+.header { background: linear-gradient(180deg, #5a9fd4 0%, #3a7fc1 100%); color: #fff; padding: 6px 12px; display: flex; align-items: center; gap: 16px; }
+.header .logo { font-size: 18px; font-weight: bold; letter-spacing: 1px; }
+.nav { background: #3a7fc1; display: flex; gap: 2px; padding: 0 8px; }
+.nav a { color: #fff; padding: 8px 14px; font-size: 12px; text-decoration: none; display: block; }
+.nav a.active { background: #2a6aaa; }
+.contents { padding: 12px; }
+.page-title { font-size: 14px; font-weight: bold; margin-bottom: 10px; color: #2a5a8a; border-bottom: 2px solid #3a7fc1; padding-bottom: 6px; }
+.shift-table { border-collapse: collapse; width: 100%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+.shift-table th { background: #d0e0f0; padding: 6px 8px; border: 1px solid #b0c4d8; text-align: center; font-size: 11px; white-space: nowrap; }
+.shift-table td { border: 1px solid #d0d8e4; padding: 3px 4px; text-align: center; white-space: nowrap; }
+.shift-table td.staff-col { background: #f4f8fc; text-align: left; padding: 4px 8px; font-size: 12px; }
+a.shiftdate { display: inline-block; padding: 3px 6px; border-radius: 2px; text-decoration: none; font-size: 11px; min-width: 28px; text-align: center; cursor: pointer; }
+.mod_btn_35_1 { background: #ddeeff; color: #336699; border: 1px solid #99bbdd; }
+.mod_btn_35_2 { background: #ffeedd; color: #996633; border: 1px solid #ddbb99; }
+.mod_btn_35_3 { background: #eeffee; color: #336633; border: 1px solid #99bb99; }
+.mod_btn_35_h { background: #eeeeee; color: #888; border: 1px solid #ccc; }
+.mod_btn_35_4 { background: #fff9c4; color: #7a6000; border: 1px solid #e0cc00; }
+.month-nav { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.month-nav a { color: #3a7fc1; text-decoration: none; font-size: 14px; }
+.month-nav .current { font-weight: bold; font-size: 14px; }
+/* Dropdown simulation */
+.tm-dropdown-demo { position: absolute; background: #fff; border: 1px solid #aaa; border-radius: 3px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); z-index: 999; min-width: 90px; font-size: 12px; display: none; }
+.tm-dropdown-demo.visible { display: block; }
+.tm-dropdown-demo div { padding: 5px 10px; cursor: pointer; }
+.tm-dropdown-demo div:hover { background: #f0f0f0; }
+.tm-dropdown-demo div.selected { background: #e8f0fe; font-weight: bold; }
+.tm-dropdown-demo div.divider { border-top: 1px solid #ddd; color: #555; }
+.dropdown-wrap { position: relative; display: inline-block; }
+</style>
+<script>
+window.shiftMasterList = {
+  "1": { shiftShortName: "A番", shiftName: "A番 09:00-18:00" },
+  "2": { shiftShortName: "B番", shiftName: "B番 10:00-19:00" },
+  "3": { shiftShortName: "C番", shiftName: "C番 12:00-21:00" }
+};
+</script>
+</head>
+<body>
+<div class="header">
+  <span class="logo">SALON BOARD</span>
+  <span style="font-size:11px;opacity:0.85;">ビューティーサロン デモ店</span>
+</div>
+<div class="nav">
+  <a href="#">予約管理</a>
+  <a href="#">掲載管理</a>
+  <a href="#">お客様管理</a>
+  <a href="#">メッセージ管理</a>
+  <a href="#">売上管理</a>
+  <a href="#">集計・分析</a>
+  <a href="#">設定</a>
+</div>
+<div class="contents">
+  <div class="page-title">シフト設定</div>
+  <div class="month-nav">
+    <a href="#">◀</a>
+    <span class="current">2026年6月</span>
+    <a href="#">▶</a>
+    <button style="font-size:12px;padding:3px 10px;border:1px solid #aaa;border-radius:2px;background:#fff;margin-left:8px;">保存</button>
+  </div>
+
+  <!-- Hidden inputs -->
+  <input type="hidden" name="org.apache.struts.taglib.html.TOKEN" value="dummytoken123">
+  <select id="shiftId" style="display:none;">
+    <option value="1">A番 09:00-18:00</option>
+    <option value="2">B番 10:00-19:00</option>
+    <option value="3">C番 12:00-21:00</option>
+  </select>
+
+  <table class="shift-table">
+    <thead>
+      <tr>
+        <th style="width:90px;">スタッフ</th>
+        <th>6/1<br><span style="font-size:10px;color:#888;">月</span></th>
+        <th>6/2<br><span style="font-size:10px;color:#c62828;">火</span></th>
+        <th>6/3<br><span style="font-size:10px;color:#888;">水</span></th>
+        <th>6/4<br><span style="font-size:10px;color:#888;">木</span></th>
+        <th>6/5<br><span style="font-size:10px;color:#888;">金</span></th>
+        <th>6/6<br><span style="font-size:10px;color:#1565c0;">土</span></th>
+        <th>6/7<br><span style="font-size:10px;color:#c62828;">日</span></th>
+        <th>6/8<br><span style="font-size:10px;color:#888;">月</span></th>
+        <th>6/9<br><span style="font-size:10px;color:#888;">火</span></th>
+        <th>6/10<br><span style="font-size:10px;color:#888;">水</span></th>
+        <th>6/11<br><span style="font-size:10px;color:#888;">木</span></th>
+        <th>6/12<br><span style="font-size:10px;color:#888;">金</span></th>
+        <th>6/13<br><span style="font-size:10px;color:#1565c0;">土</span></th>
+        <th>6/14<br><span style="font-size:10px;color:#c62828;">日</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="staff-col">スタッフA</td>
+        <td><a class="shiftdate mod_btn_35_1" id="staff1_20260601">A番</a></td>
+        <td><a class="shiftdate mod_btn_35_1" id="staff1_20260602">A番</a></td>
+        <td><a class="shiftdate mod_btn_35_2" id="staff1_20260603">B番</a></td>
+        <td><a class="shiftdate mod_btn_35_2" id="staff1_20260604">B番</a></td>
+        <td><a class="shiftdate mod_btn_35_1" id="staff1_20260605">A番</a></td>
+        <td><a class="shiftdate mod_btn_35_h" id="staff1_20260606">休</a></td>
+        <td><a class="shiftdate mod_btn_35_h" id="staff1_20260607">休</a></td>
+        <td><a class="shiftdate mod_btn_35_1" id="staff1_20260608">A番</a></td>
+        <td><a class="shiftdate mod_btn_35_3" id="staff1_20260609">C番</a></td>
+        <td><a class="shiftdate mod_btn_35_3" id="staff1_20260610">C番</a></td>
+        <td><a class="shiftdate mod_btn_35_2" id="staff1_20260611">B番</a></td>
+        <td><a class="shiftdate mod_btn_35_1" id="staff1_20260612">A番</a></td>
+        <td><a class="shiftdate mod_btn_35_h" id="staff1_20260613">休</a></td>
+        <td><a class="shiftdate mod_btn_35_h" id="staff1_20260614">休</a></td>
+      </tr>
+      <tr>
+        <td class="staff-col">スタッフB</td>
+        <td><a class="shiftdate mod_btn_35_2" id="staff2_20260601">B番</a></td>
+        <td><a class="shiftdate mod_btn_35_2" id="staff2_20260602">B番</a></td>
+        <td><a class="shiftdate mod_btn_35_h" id="staff2_20260603">休</a></td>
+        <td><a class="shiftdate mod_btn_35_1" id="staff2_20260604">A番</a></td>
+        <td><a class="shiftdate mod_btn_35_2" id="staff2_20260605">B番</a></td>
+        <td><a class="shiftdate mod_btn_35_h" id="staff2_20260606">休</a></td>
+        <td><a class="shiftdate mod_btn_35_h" id="staff2_20260607">休</a></td>
+        <td><a class="shiftdate mod_btn_35_3" id="staff2_20260608">C番</a></td>
+        <td><a class="shiftdate mod_btn_35_2" id="staff2_20260609">B番</a></td>
+        <td><a class="shiftdate mod_btn_35_h" id="staff2_20260610">休</a></td>
+        <td><a class="shiftdate mod_btn_35_1" id="staff2_20260611">A番</a></td>
+        <td><a class="shiftdate mod_btn_35_2" id="staff2_20260612">B番</a></td>
+        <td><a class="shiftdate mod_btn_35_h" id="staff2_20260613">休</a></td>
+        <td><a class="shiftdate mod_btn_35_h" id="staff2_20260614">休</a></td>
+      </tr>
+      <tr>
+        <td class="staff-col">スタッフC</td>
+        <td><a class="shiftdate mod_btn_35_3" id="staff3_20260601">C番</a></td>
+        <td><a class="shiftdate mod_btn_35_h" id="staff3_20260602">休</a></td>
+        <td><a class="shiftdate mod_btn_35_1" id="staff3_20260603">A番</a></td>
+        <td><a class="shiftdate mod_btn_35_3" id="staff3_20260604">C番</a></td>
+        <td><a class="shiftdate mod_btn_35_h" id="staff3_20260605">休</a></td>
+        <td><a class="shiftdate mod_btn_35_2" id="staff3_20260606">B番</a></td>
+        <td><a class="shiftdate mod_btn_35_h" id="staff3_20260607">休</a></td>
+        <td><a class="shiftdate mod_btn_35_1" id="staff3_20260608">A番</a></td>
+        <td><a class="shiftdate mod_btn_35_1" id="staff3_20260609">A番</a></td>
+        <td><a class="shiftdate mod_btn_35_3" id="staff3_20260610">C番</a></td>
+        <td><a class="shiftdate mod_btn_35_h" id="staff3_20260611">休</a></td>
+        <td><a class="shiftdate mod_btn_35_3" id="staff3_20260612">C番</a></td>
+        <td><a class="shiftdate mod_btn_35_2" id="staff3_20260613">B番</a></td>
+        <td><a class="shiftdate mod_btn_35_h" id="staff3_20260614">休</a></td>
+      </tr>
+      <tr>
+        <td class="staff-col">スタッフD</td>
+        <td><a class="shiftdate mod_btn_35_1" id="staff4_20260601">A番</a></td>
+        <td><a class="shiftdate mod_btn_35_4" id="staff4_20260602">B番</a></td>
+        <td><a class="shiftdate mod_btn_35_2" id="staff4_20260603">B番</a></td>
+        <td><a class="shiftdate mod_btn_35_h" id="staff4_20260604">休</a></td>
+        <td><a class="shiftdate mod_btn_35_1" id="staff4_20260605">A番</a></td>
+        <td><a class="shiftdate mod_btn_35_1" id="staff4_20260606">A番</a></td>
+        <td><a class="shiftdate mod_btn_35_h" id="staff4_20260607">休</a></td>
+        <td><a class="shiftdate mod_btn_35_2" id="staff4_20260608">B番</a></td>
+        <td><a class="shiftdate mod_btn_35_h" id="staff4_20260609">休</a></td>
+        <td><a class="shiftdate mod_btn_35_1" id="staff4_20260610">A番</a></td>
+        <td><a class="shiftdate mod_btn_35_3" id="staff4_20260611">C番</a></td>
+        <td><a class="shiftdate mod_btn_35_h" id="staff4_20260612">休</a></td>
+        <td><a class="shiftdate mod_btn_35_1" id="staff4_20260613">A番</a></td>
+        <td><a class="shiftdate mod_btn_35_h" id="staff4_20260614">休</a></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+</body>
+</html>
