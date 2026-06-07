@@ -2,7 +2,7 @@
 // @name         サロンボード クーポンリスト強化
 // @namespace    https://github.com/catdance124/tm-salon-board
 // @version      1.0.0
-// @description  クーポン一覧にコピー・インライン詳細・↑↓並べ替えを追加
+// @description  クーポン一覧にコピー・インライン詳細・ドラッグ&ドロップ並べ替えを追加
 // @author       catdance124
 // @match        https://salonboard.com/CNK/draft/couponList*
 // @match        https://salonboard.com/CNK/draft/couponEdit*
