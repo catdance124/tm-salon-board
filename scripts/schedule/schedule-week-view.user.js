@@ -261,9 +261,9 @@
   function waitAndRun(retries = 20) {
     const ready = document.querySelector('.scheduleCalenderPager') && document.getElementById('date')?.value;
     if (ready) {
-      const calPager = document.querySelector('.scheduleCalenderPager');
+      const scheduleFooter = document.getElementById('scheduleFooter') || document.querySelector('.scheduleCalenderPager')?.closest('.scheduleNavBar') || document.querySelector('.scheduleCalenderPager');
       currentMonday = getWeekMonday(getCurrentDate());
-      weekPanelEl = createWeekPanel(calPager);
+      weekPanelEl = createWeekPanel(scheduleFooter);
       loadAndRender();
       console.log('[tm-schedule-week] 初期化完了');
     } else if (retries > 0) {
