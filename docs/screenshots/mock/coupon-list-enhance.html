@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>サロンボード - クーポン一覧</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Meiryo", "メイリオ", sans-serif; font-size: 12px; background: #f0f4f8; color: #333; }
+.header { background: linear-gradient(180deg, #5a9fd4 0%, #3a7fc1 100%); color: #fff; padding: 6px 12px; display: flex; align-items: center; gap: 16px; }
+.header .logo { font-size: 18px; font-weight: bold; letter-spacing: 1px; }
+.nav { background: #3a7fc1; display: flex; gap: 2px; padding: 0 8px; }
+.nav a { color: #fff; padding: 8px 14px; font-size: 12px; text-decoration: none; display: block; }
+.nav a.active { background: #2a6aaa; }
+.contents { padding: 12px; }
+.page-title { font-size: 14px; font-weight: bold; margin-bottom: 10px; color: #2a5a8a; border-bottom: 2px solid #3a7fc1; padding-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
+.coupon-table { border-collapse: collapse; width: 100%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+.coupon-table th { background: #d0e0f0; padding: 7px 8px; border: 1px solid #b0c4d8; font-size: 11px; white-space: nowrap; }
+.coupon-table td { border: 1px solid #d8e4ee; padding: 5px 7px; vertical-align: top; font-size: 12px; }
+.coupon-table tr:nth-child(even) td { background: #f8fafc; }
+.coupon-table tr:hover td { background: #e8f0f8; }
+.status-badge { display: inline-block; padding: 2px 6px; border-radius: 2px; font-size: 10px; font-weight: bold; }
+.status-open { background: #c8e6c9; color: #2e7d32; border: 1px solid #a5d6a7; }
+.status-closed { background: #ffcdd2; color: #c62828; border: 1px solid #ef9a9a; }
+.status-draft { background: #fff9c4; color: #7a6000; border: 1px solid #fff176; }
+.btn-sm { display: inline-block; padding: 2px 8px; font-size: 11px; border-radius: 2px; cursor: pointer; text-decoration: none; border: 1px solid; }
+.btn-edit { background: #e8f0fe; color: #1a73e8; border-color: #90caf9; }
+.btn-del  { background: #fce8e6; color: #c62828; border-color: #ef9a9a; }
+/* Script adds these */
+.tm-drag-handle { display: inline-block; cursor: grab; color: #aaa; font-size: 14px; margin-right: 4px; user-select: none; }
+.tm-drag-handle:hover { color: #666; }
+.tm-dragging { opacity: 0.5; }
+.tm-drag-over td { border-top: 2px solid #3a7fc1 !important; }
+.tm-btn { display: inline-block; padding: 2px 8px; font-size: 11px; border-radius: 2px; cursor: pointer; border: 1px solid; margin: 1px; }
+.tm-detail-btn { background: #f3e5f5; color: #7b1fa2; border-color: #ce93d8; }
+.tm-copy-btn   { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; }
+.tm-detail-row td { background: #fafafa !important; }
+.tm-detail-content { display: flex; flex-wrap: wrap; gap: 6px 16px; padding: 6px 8px; }
+.tm-dl { display: flex; gap: 4px; align-items: baseline; font-size: 11px; }
+.tm-dt { color: #888; white-space: nowrap; }
+.tm-dt::after { content: ':'; }
+.tm-dd { color: #333; }
+.tm-save-banner { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #f0a030; color: #fff; padding: 10px 20px; border-radius: 6px; font-size: 13px; z-index: 99999; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+</style>
+</head>
+<body>
+<div class="header">
+  <span class="logo">SALON BOARD</span>
+  <span style="font-size:11px;opacity:0.85;">ビューティーサロン デモ店</span>
+</div>
+<div class="nav">
+  <a href="#">予約管理</a>
+  <a href="#" class="active">掲載管理</a>
+  <a href="#">お客様管理</a>
+  <a href="#">メッセージ管理</a>
+  <a href="#">売上管理</a>
+  <a href="#">設定</a>
+</div>
+<div class="contents">
+  <div class="page-title">
+    <span>クーポン一覧</span>
+    <div style="display:flex;gap:6px;">
+      <button style="font-size:12px;padding:4px 12px;border:1px solid #3a7fc1;border-radius:2px;background:#3a7fc1;color:#fff;cursor:pointer;">新規クーポン作成</button>
+      <button id="sortSaveBtn" style="font-size:12px;padding:4px 12px;border:1px solid #aaa;border-radius:2px;background:#fff;cursor:pointer;">クーポン並び替え登録</button>
+    </div>
+  </div>
+
+  <form id="couponSelectForm">
+    <input type="hidden" name="page" value="1">
+    <input type="hidden" name="_csrf" value="dummycsrf">
+  </form>
+
+  <table class="coupon-table">
+    <thead>
+      <tr>
+        <th style="width:40px;">No.</th>
+        <th style="width:60px;">状態</th>
+        <th style="width:60px;">掲載</th>
+        <th>クーポン名</th>
+        <th style="width:70px;">料金</th>
+        <th style="width:60px;">割引</th>
+        <th style="width:80px;">施術時間</th>
+        <th style="width:100px;">操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <input type="hidden" name="frmCouponListDto[0].seq" value="1">
+          1
+        </td>
+        <td><span class="status-badge status-open">公開中</span></td>
+        <td style="text-align:center;"><input type="checkbox" checked disabled></td>
+        <td>
+          <a href="#" onclick="return false;" style="color:#1a73e8;text-decoration:none;font-weight:bold;">オフ＆ジェルネイル（手）フルカラー</a>
+        </td>
+        <td style="text-align:right;">8,800円</td>
+        <td style="text-align:center;">—</td>
+        <td style="text-align:center;">90分</td>
+        <td>
+          <a href="#" onclick="doEdit(event, '20260101', 'CPN001')" class="btn-sm btn-edit">編集</a>
+          <a href="#" class="btn-sm btn-del">削除</a>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <input type="hidden" name="frmCouponListDto[1].seq" value="2">
+          2
+        </td>
+        <td><span class="status-badge status-open">公開中</span></td>
+        <td style="text-align:center;"><input type="checkbox" checked disabled></td>
+        <td>
+          <a href="#" onclick="return false;" style="color:#1a73e8;text-decoration:none;font-weight:bold;">ジェルネイル 足（フルカラー）</a>
+        </td>
+        <td style="text-align:right;">6,600円</td>
+        <td style="text-align:center;">500円引き</td>
+        <td style="text-align:center;">60分</td>
+        <td>
+          <a href="#" onclick="doEdit(event, '20260102', 'CPN002')" class="btn-sm btn-edit">編集</a>
+          <a href="#" class="btn-sm btn-del">削除</a>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <input type="hidden" name="frmCouponListDto[2].seq" value="3">
+          3
+        </td>
+        <td><span class="status-badge status-open">公開中</span></td>
+        <td style="text-align:center;"><input type="checkbox" checked disabled></td>
+        <td>
+          <a href="#" onclick="return false;" style="color:#1a73e8;text-decoration:none;font-weight:bold;">ネイルケア＋クリアジェル（手足セット）</a>
+        </td>
+        <td style="text-align:right;">12,000円</td>
+        <td style="text-align:center;">10%OFF</td>
+        <td style="text-align:center;">120分</td>
+        <td>
+          <a href="#" onclick="doEdit(event, '20260103', 'CPN003')" class="btn-sm btn-edit">編集</a>
+          <a href="#" class="btn-sm btn-del">削除</a>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <input type="hidden" name="frmCouponListDto[3].seq" value="4">
+          4
+        </td>
+        <td><span class="status-badge status-draft">下書き</span></td>
+        <td style="text-align:center;"><input type="checkbox" disabled></td>
+        <td>
+          <a href="#" onclick="return false;" style="color:#1a73e8;text-decoration:none;font-weight:bold;">アート込みジェルネイル（手）デザインコース</a>
+        </td>
+        <td style="text-align:right;">11,000円</td>
+        <td style="text-align:center;">—</td>
+        <td style="text-align:center;">100分</td>
+        <td>
+          <a href="#" onclick="doEdit(event, '20260104', 'CPN004')" class="btn-sm btn-edit">編集</a>
+          <a href="#" class="btn-sm btn-del">削除</a>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <input type="hidden" name="frmCouponListDto[4].seq" value="5">
+          5
+        </td>
+        <td><span class="status-badge status-closed">終了</span></td>
+        <td style="text-align:center;"><input type="checkbox" disabled></td>
+        <td>
+          <a href="#" onclick="return false;" style="color:#1a73e8;text-decoration:none;font-weight:bold;">初回限定 ジェルネイル（手）フルカラー</a>
+        </td>
+        <td style="text-align:right;">5,500円</td>
+        <td style="text-align:center;">20%OFF</td>
+        <td style="text-align:center;">75分</td>
+        <td>
+          <a href="#" onclick="doEdit(event, '20260105', 'CPN005')" class="btn-sm btn-edit">編集</a>
+          <a href="#" class="btn-sm btn-del">削除</a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<script>
+function doEdit(e, sortDate, id) { e.preventDefault(); }
+window.ctxStr = 'CNK';
+</script>
+</body>
+</html>

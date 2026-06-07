@@ -1,20 +1,20 @@
 # tm-salon-board
 
-サロンボード（ネイルサロン向けSaaS）のUI改善 TamperMonkey スクリプト集。
+サロンボード（サロン向けSaaS）のUI改善 TamperMonkey スクリプト集。
 
 ## 使い方
 
-### 1. TamperMonkey をインストール
+1. TamperMonkey をインストール
 
-ブラウザに [TamperMonkey](https://www.tampermonkey.net/) 拡張機能を追加する。
+    ブラウザに [TamperMonkey](https://www.tampermonkey.net/) 拡張機能を追加する。
 
-### 2. スクリプトをインストール
+2. スクリプトをインストール
 
-下記スクリプト一覧のインストールリンクをクリック → TamperMonkey の確認画面で「インストール」をクリック。
+    下記スクリプト一覧のインストールリンクをクリック → TamperMonkey の確認画面で「インストール」をクリック。
 
-### 3. サロンボードにアクセス
+3. サロンボードにアクセス
 
-対象ページを開くと自動でスクリプトが適用される。
+    対象ページを開くと自動でスクリプトが適用される。
 
 ---
 
@@ -22,8 +22,26 @@
 
 | カテゴリ | スクリプト | 説明 | インストール |
 |---------|-----------|------|------------|
+| スケジュール | [スケジュール 週表示](#スケジュール-週表示) | スケジュール画面に7日分の週表示パネルを追加 | [![Install](https://img.shields.io/badge/install-green)](https://raw.githubusercontent.com/catdance124/tm-salon-board/main/scripts/schedule/schedule-week-view.user.js) |
 | シフト | [シフトセル インライン編集](#シフトセル-インライン編集) | シフト設定画面の各セルをプルダウンで直接変更 | [![Install](https://img.shields.io/badge/install-green)](https://raw.githubusercontent.com/catdance124/tm-salon-board/main/scripts/shift/shift-inline-edit.user.js) |
 | クーポン | [クーポンリスト強化](#クーポンリスト強化) | クーポン一覧にコピー・インライン詳細表示・並べ替えを追加 | [![Install](https://img.shields.io/badge/install-green)](https://raw.githubusercontent.com/catdance124/tm-salon-board/main/scripts/coupon/coupon-list-enhance.user.js) |
+
+---
+
+### スケジュール
+
+#### スケジュール 週表示
+[![Install](https://img.shields.io/badge/TamperMonkey-Install-green)](https://raw.githubusercontent.com/catdance124/tm-salon-board/main/scripts/schedule/schedule-week-view.user.js)
+
+スケジュール画面の日付ナビ下に7日分（月〜日）の週表示パネルを自動表示する。
+
+![スケジュール 週表示](docs/screenshots/schedule-week-view.png)
+
+| 操作 | 動作 |
+|------|------|
+| ページを開く | 週表示パネルが自動で表示される |
+| 日付をクリック | その日の詳細スケジュールページへ移動 |
+| 「前週」「次週」ボタン（上部・下部） | 表示週を前後に切り替え |
 
 ---
 
@@ -33,6 +51,8 @@
 [![Install](https://img.shields.io/badge/TamperMonkey-Install-green)](https://raw.githubusercontent.com/catdance124/tm-salon-board/main/scripts/shift/shift-inline-edit.user.js)
 
 シフト設定画面の各セルをクリックするとプルダウンが表示され、モーダルを開かずにシフトを直接変更できる。
+
+![シフトセル インライン編集](docs/screenshots/shift-inline-edit.png)
 
 | 操作 | 動作 |
 |------|------|
@@ -49,6 +69,8 @@
 [![Install](https://img.shields.io/badge/TamperMonkey-Install-green)](https://raw.githubusercontent.com/catdance124/tm-salon-board/main/scripts/coupon/coupon-list-enhance.user.js)
 
 クーポン一覧ページに以下の機能を追加する。
+
+![クーポンリスト強化](docs/screenshots/coupon-list-enhance.png)
 
 | 操作 | 動作 |
 |------|------|

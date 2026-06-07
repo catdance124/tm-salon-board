@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>サロンボード - スケジュール</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Meiryo", "メイリオ", sans-serif; font-size: 12px; background: #f0f4f8; color: #333; }
+.header { background: linear-gradient(180deg, #5a9fd4 0%, #3a7fc1 100%); color: #fff; padding: 6px 12px; display: flex; align-items: center; gap: 16px; }
+.header .logo { font-size: 18px; font-weight: bold; letter-spacing: 1px; }
+.nav { background: #3a7fc1; display: flex; gap: 2px; padding: 0 8px; }
+.nav a { color: #fff; padding: 8px 14px; font-size: 12px; text-decoration: none; display: block; }
+.nav a:hover, .nav a.active { background: #2a6aaa; }
+.subnav { background: #dce8f5; padding: 4px 12px; display: flex; gap: 8px; }
+.subnav a { color: #3a7fc1; text-decoration: none; font-size: 12px; padding: 4px 10px; border-radius: 3px; border: 1px solid #aac8e8; background: #fff; }
+.subnav a.active { background: #3a7fc1; color: #fff; border-color: #3a7fc1; }
+.contents { padding: 8px 12px; }
+.scheduleHeader { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.scheduleHeader .date-nav { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: bold; }
+.scheduleHeader .date-nav a { color: #3a7fc1; text-decoration: none; font-size: 16px; }
+/* The original schedule grid */
+.schedule-grid { border: 1px solid #b0c4d8; border-radius: 3px; overflow: hidden; margin-bottom: 4px; }
+.schedule-grid-header { display: grid; grid-template-columns: 100px repeat(12, 1fr); background: #d0e0f0; border-bottom: 1px solid #b0c4d8; }
+.schedule-grid-header div { padding: 4px 2px; text-align: center; font-size: 11px; border-right: 1px solid #b0c4d8; }
+.schedule-row { display: grid; grid-template-columns: 100px repeat(12, 1fr); border-bottom: 1px solid #e0e8f0; }
+.schedule-row:last-child { border-bottom: none; }
+.schedule-row .staff-name { padding: 6px 8px; font-size: 12px; background: #f4f8fc; border-right: 1px solid #c8d8e8; display: flex; align-items: center; white-space: nowrap; overflow: hidden; }
+.schedule-row .cell { border-right: 1px solid #e8eef5; min-height: 40px; position: relative; }
+.schedule-row .cell.holiday { background: #e8e8e8; }
+.resv-block { position: absolute; top: 2px; left: 1px; right: 1px; border-radius: 2px; padding: 1px 3px; font-size: 10px; white-space: nowrap; overflow: hidden; }
+/* Footer nav */
+.scheduleNavBar { background: #dce8f5; padding: 6px 10px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; border-top: 1px solid #b0c4d8; margin-top: 0; }
+.scheduleNavBar a, .scheduleNavBar button { color: #3a7fc1; text-decoration: none; font-size: 12px; padding: 3px 8px; border-radius: 2px; border: 1px solid #aac8e8; background: #fff; cursor: pointer; }
+.scheduleCalenderPager { display: flex; align-items: center; gap: 4px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <span class="logo">SALON BOARD</span>
+  <span style="font-size:11px;opacity:0.85;">ビューティーサロン デモ店</span>
+</div>
+<div class="nav">
+  <a href="#" class="active">予約管理</a>
+  <a href="#">掲載管理</a>
+  <a href="#">お客様管理</a>
+  <a href="#">メッセージ管理</a>
+  <a href="#">売上管理</a>
+  <a href="#">集計・分析</a>
+  <a href="#">サロンダイレクト</a>
+  <a href="#">振込・請求</a>
+  <a href="#">設定</a>
+</div>
+<div class="subnav">
+  <a href="#" class="active">スケジュール</a>
+  <a href="#">予約一覧</a>
+  <a href="#">毎月の受付設定</a>
+  <a href="#">一括停止・再開</a>
+</div>
+<div class="contents">
+  <div class="scheduleHeader">
+    <div class="date-nav">
+      <a href="#">◀</a>
+      <span>6月7日（日）</span>
+      <a href="#">▶</a>
+    </div>
+    <span style="font-size:11px;color:#666;">標準</span>
+    <select style="font-size:12px;padding:2px 6px;border:1px solid #aaa;border-radius:2px;">
+      <option>全スタッフ</option>
+    </select>
+    <button style="font-size:12px;padding:3px 10px;border:1px solid #aaa;border-radius:2px;background:#fff;cursor:pointer;">アイコン説明</button>
+    <button style="font-size:12px;padding:3px 10px;border:1px solid #aaa;border-radius:2px;background:#fff;cursor:pointer;">印刷</button>
+    <button style="font-size:12px;padding:3px 10px;border:1px solid #3a7fc1;border-radius:2px;background:#3a7fc1;color:#fff;cursor:pointer;">最新を表示</button>
+  </div>
+
+  <!-- Original schedule grid -->
+  <div class="schedule-grid">
+    <div class="schedule-grid-header">
+      <div>スタッフ</div>
+      <div>9:00</div><div>10:00</div><div>11:00</div><div>12:00</div>
+      <div>13:00</div><div>14:00</div><div>15:00</div><div>16:00</div>
+      <div>17:00</div><div>18:00</div><div>19:00</div><div>20:00</div>
+    </div>
+    <div class="schedule-row">
+      <div class="staff-name">スタッフA</div>
+      <div class="cell"></div>
+      <div class="cell" style="position:relative;"><div class="resv-block" style="background:#90caf933;border-left:3px solid #90caf9;">山田 花子</div></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell" style="position:relative;"><div class="resv-block" style="background:#a5d6a733;border-left:3px solid #a5d6a7;">佐藤 太郎</div></div>
+      <div class="cell"></div>
+      <div class="cell" style="position:relative;"><div class="resv-block" style="background:#ffcc8033;border-left:3px solid #ffcc80;">鈴木 美咲</div></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+    </div>
+    <div class="schedule-row">
+      <div class="staff-name">スタッフB</div>
+      <div class="cell holiday"></div>
+      <div class="cell holiday"></div>
+      <div class="cell holiday"></div>
+      <div class="cell holiday"></div>
+      <div class="cell holiday"></div>
+      <div class="cell holiday"></div>
+      <div class="cell holiday"></div>
+      <div class="cell holiday"></div>
+      <div class="cell holiday"></div>
+      <div class="cell holiday"></div>
+      <div class="cell holiday"></div>
+      <div class="cell holiday"></div>
+    </div>
+    <div class="schedule-row">
+      <div class="staff-name">スタッフC</div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell" style="position:relative;"><div class="resv-block" style="background:#ce93d833;border-left:3px solid #ce93d8;">田中 由美</div></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell" style="position:relative;"><div class="resv-block" style="background:#90caf933;border-left:3px solid #90caf9;">高橋 さくら</div></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell" style="position:relative;"><div class="resv-block" style="background:#a5d6a733;border-left:3px solid #a5d6a7;">伊藤 れな</div></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+    </div>
+  </div>
+
+  <!-- Footer nav bar (scheduleFooter) -->
+  <div id="scheduleFooter" class="scheduleNavBar cf jscScheduleFooter">
+    <div class="scheduleCalenderPager">
+      <a href="#">前の日</a>
+      <a href="#">5</a><a href="#">6</a><strong style="padding:3px 6px;background:#3a7fc1;color:#fff;border-radius:2px;">7</strong><a href="#">8</a><a href="#">9</a><a href="#">10</a><a href="#">11</a>
+      <a href="#">次の日</a>
+      <a href="#">予定</a>
+    </div>
+    <a href="#" style="margin-left:auto;">シフト設定</a>
+    <a href="#">予約画面</a>
+    <a href="#">設定</a>
+  </div>
+
+  <!-- Hidden inputs for the script to read -->
+  <input type="hidden" name="org.apache.struts.taglib.html.TOKEN" value="dummytoken123">
+  <input type="hidden" name="storeIdForMultipleTabCheck" value="dummy_store_001">
+  <input type="hidden" id="date" value="20260607">
+</div>
+</body>
+</html>
