@@ -94,67 +94,97 @@
     return [...staffMap.values()].sort((a, b) => a.sortNo - b.sortNo);
   }
 
-  function renderReservationBlock(rsv) {
-    const color = rsv.coupons?.[0]?.categories?.[0]?.iconColor || 'b0c4de';
-    const endTime = addMinutes(rsv.startTime, rsv.execTime);
-    const routeShort = rsv.routeShortName ? `<span style="font-size:9px;color:#666;">[${rsv.routeShortName}]</span> ` : '';
-    return `<div style="background:#${color}33;border-left:3px solid #${color};padding:2px 4px;margin:2px 0;border-radius:2px;cursor:default;" title="${rsv.reserveName}\n${formatTime(rsv.startTime)}〜${formatTime(endTime)}(${rsv.execTime}分)">
-      <div style="font-size:10px;color:#555;">${formatTime(rsv.startTime)}〜${formatTime(endTime)}</div>
-      <div style="font-size:11px;font-weight:bold;">${routeShort}${rsv.reserveName || rsv.customer?.name || ''}</div>
+  function buildReserveMap(data) {
+    const map = new Map();
+    for (const r of [...(data.netReservations || []), ...(data.extReservations || [])]) {
+      map.set(r.reserveId || r.id, r);
+    }
+    return map;
+  }
+
+  function renderReservationBlock(assignment, rsv) {
+    const color = rsv?.coupons?.[0]?.categories?.[0]?.iconColor || 'b0c4de';
+    const endTime = addMinutes(assignment.startTime, assignment.execTime);
+    const name = rsv?.reserveName || rsv?.customer?.name || '';
+    const routeShort = rsv?.routeShortName ? `<span style="font-size:9px;color:#666;">[${rsv.routeShortName}]</span> ` : '';
+    return `<div style="background:#${color}33;border-left:3px solid #${color};padding:2px 4px;margin:2px 0;border-radius:2px;cursor:default;" title="${name}\n${formatTime(assignment.startTime)}〜${formatTime(endTime)}(${assignment.execTime}分)">
+      <div style="font-size:10px;color:#555;">${formatTime(assignment.startTime)}〜${formatTime(endTime)}</div>
+      <div style="font-size:11px;font-weight:bold;">${routeShort}${name}</div>
     </div>`;
   }
 
-  function renderCell(staffId, dayEntry) {
+  function renderPlanBlock(plan) {
+    if (plan.isAllDay) return '';
+    const endTime = addMinutes(plan.startTime, plan.execTime);
+    return `<div style="background:#e8e8e833;border-left:3px solid #aaa;padding:2px 4px;margin:2px 0;border-radius:2px;cursor:default;" title="${plan.title}\n${formatTime(plan.startTime)}〜${formatTime(endTime)}(${plan.execTime}分)">
+      <div style="font-size:10px;color:#555;">${formatTime(plan.startTime)}〜${formatTime(endTime)}</div>
+      <div style="font-size:11px;color:#666;">${plan.title || '予定'}</div>
+    </div>`;
+  }
+
+  function renderCell(staffId, dayEntry, reserveMap) {
     const { data } = dayEntry;
     if (!data || data.result !== 'success') {
       return `<td style="background:#f5f5f5;text-align:center;color:#bbb;font-size:11px;border:1px solid #e0e0e0;">-</td>`;
     }
 
-    const staffSchedule = data.staffSchedules?.find(s => s.stock?.staffId === staffId);
-    if (!staffSchedule) {
+    const ss = data.staffSchedules?.find(s => s.stock?.staffId === staffId);
+    if (!ss) {
       return `<td style="background:#f9f9f9;border:1px solid #e0e0e0;"></td>`;
     }
 
-    const holidayPlan = staffSchedule.plans?.find(p => p.isAllDay || p.title === '休日');
-    if (holidayPlan) {
-      return `<td style="background:#f0f0f0;text-align:center;color:#999;font-size:12px;vertical-align:middle;border:1px solid #e0e0e0;">${holidayPlan.title || '休'}</td>`;
-    }
+    const allDayPlan = ss.plans?.find(p => p.isAllDay);
+    const timedPlans = (ss.plans || []).filter(p => !p.isAllDay);
+    const assignments = ss.assignments || [];
 
-    const assignments = staffSchedule.assignments || [];
-    if (assignments.length === 0) {
+    if (assignments.length === 0 && timedPlans.length === 0) {
+      if (allDayPlan) {
+        return `<td style="background:#f0f0f0;text-align:center;color:#999;font-size:12px;vertical-align:middle;border:1px solid #e0e0e0;">${allDayPlan.title || '休'}</td>`;
+      }
       return `<td style="background:#fff;border:1px solid #e0e0e0;min-width:110px;"></td>`;
     }
 
-    const sorted = [...assignments].sort((a, b) => a.startTime.localeCompare(b.startTime));
-    const blocks = sorted.map(renderReservationBlock).join('');
-    return `<td style="background:#fff;vertical-align:top;padding:3px;border:1px solid #e0e0e0;min-width:110px;">${blocks}</td>`;
+    const items = [
+      ...assignments.map(a => ({ startTime: a.startTime, html: renderReservationBlock(a, reserveMap.get(a.reserveId)) })),
+      ...timedPlans.map(p => ({ startTime: p.startTime, html: renderPlanBlock(p) })),
+    ].sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+    const allDayLabel = allDayPlan
+      ? `<div style="font-size:10px;color:#888;background:#f0f0f0;padding:1px 4px;border-radius:2px;margin-bottom:3px;">${allDayPlan.title}</div>`
+      : '';
+
+    return `<td style="background:#fff;vertical-align:top;padding:3px;border:1px solid #e0e0e0;min-width:110px;">${allDayLabel}${items.map(i => i.html).join('')}</td>`;
   }
 
   function renderWeekTable(weekData, staffList) {
     const todayStr = formatDateYMD(new Date());
 
-    const headerCells = weekData.map(({ date, dateStr }) => {
+    const reserveMaps = weekData.map(({ data }) => buildReserveMap(data || {}));
+
+    // ヘッダー行: スタッフ名
+    const staffHeaders = staffList.map(staff =>
+      `<th style="padding:6px 8px;background:#e8e8e8;border:1px solid #d0d0d0;white-space:nowrap;font-size:12px;text-align:center;">${staff.name}</th>`
+    ).join('');
+
+    // データ行: 日付ごと（縦軸=日付、横軸=スタッフ）
+    const rows = weekData.map(({ date, dateStr }, i) => {
       const dow = date.getDay();
       const isToday = dateStr === todayStr;
       const fgColor = isToday ? '#1a73e8' : dow === 0 ? '#c62828' : dow === 6 ? '#1565c0' : '#333';
       const bgColor = isToday ? '#e8f0fe' : '#f4f4f4';
       const label = `${date.getMonth() + 1}/${date.getDate()}(${DAYS_JA[dow]})`;
-      return `<th style="padding:6px 10px;background:${bgColor};color:${fgColor};font-weight:bold;text-align:center;border:1px solid #d0d0d0;white-space:nowrap;min-width:110px;">
-        <a href="/KLP/schedule/salonSchedule/?date=${dateStr}" style="color:inherit;text-decoration:none;" title="${dateStr}">${label}</a>
-      </th>`;
-    }).join('');
-
-    const rows = staffList.map(staff => {
-      const nameTd = `<td style="padding:6px 8px;background:#f4f4f4;font-weight:bold;white-space:nowrap;border:1px solid #d0d0d0;font-size:12px;">${staff.name}</td>`;
-      const cells = weekData.map(entry => renderCell(staff.staffId, entry)).join('');
-      return `<tr>${nameTd}${cells}</tr>`;
+      const dateTd = `<td style="padding:6px 10px;background:${bgColor};color:${fgColor};font-weight:bold;white-space:nowrap;border:1px solid #d0d0d0;text-align:center;vertical-align:middle;">
+        <a href="/KLP/schedule/salonSchedule/?date=${dateStr}" style="color:inherit;text-decoration:none;">${label}</a>
+      </td>`;
+      const cells = staffList.map(staff => renderCell(staff.staffId, { date, dateStr, data: weekData[i].data }, reserveMaps[i])).join('');
+      return `<tr>${dateTd}${cells}</tr>`;
     }).join('');
 
     return `<table style="border-collapse:collapse;width:100%;font-size:12px;">
       <thead>
         <tr>
           <th style="padding:6px 8px;background:#e8e8e8;border:1px solid #d0d0d0;"></th>
-          ${headerCells}
+          ${staffHeaders}
         </tr>
       </thead>
       <tbody>${rows}</tbody>
@@ -215,7 +245,7 @@
         <span style="flex:1;"></span>
         <button class="tm-week-close" style="background:transparent;border:none;color:#fff;cursor:pointer;font-size:18px;line-height:1;padding:0 2px;" title="閉じる">×</button>
       </div>
-      <div class="tm-week-body" style="overflow-x:auto;max-height:480px;overflow-y:auto;"></div>
+      <div class="tm-week-body"></div>
     `;
 
     panel.querySelector('.tm-week-prev').addEventListener('click', () => shiftWeek(-1));
