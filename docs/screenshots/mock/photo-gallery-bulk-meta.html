@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>サロンボード - フォトギャラリー メタ情報一括設定</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Meiryo", "メイリオ", sans-serif; font-size: 12px; background: #f0f4f8; color: #333; }
+.header { background: linear-gradient(180deg, #5a9fd4 0%, #3a7fc1 100%); color: #fff; padding: 6px 12px; display: flex; align-items: center; gap: 16px; }
+.header .logo { font-size: 18px; font-weight: bold; letter-spacing: 1px; }
+.nav { background: #3a7fc1; display: flex; gap: 2px; padding: 0 8px; }
+.nav a { color: #fff; padding: 8px 14px; font-size: 12px; text-decoration: none; display: block; }
+.nav a:hover, .nav a.active { background: #2a6aaa; }
+.contents { padding: 12px; }
+.page-title { font-size: 15px; font-weight: bold; border-left: 4px solid #3a7fc1; padding-left: 8px; margin-bottom: 12px; }
+
+/* 背景のフォトギャラリー編集テーブル（ダミー） */
+.gtable { width: 640px; border-collapse: collapse; background: #fff; border: 1px solid #c8d8e8; }
+.gtable th, .gtable td { border: 1px solid #d8e4f0; padding: 6px 8px; font-size: 11px; vertical-align: top; }
+.gtable th { background: #eef4fb; color: #3a7fc1; }
+.gtable .thumb { width: 64px; height: 48px; border-radius: 3px; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 9px; }
+.gtable input[type=text], .gtable textarea { width: 100%; border: 1px solid #ccc; border-radius: 3px; font-size: 11px; padding: 2px 4px; }
+.gtable .no { width: 36px; text-align: center; }
+.empty-row td { background: #fffdf0; }
+
+/* ===== 以下、ユーザースクリプトの一括設定パネル CSS（実物と同一） ===== */
+.tm-bm-panel{position:fixed;right:16px;bottom:16px;z-index:99990;width:280px;background:#fff;border:1px solid #c8d8e8;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.2);font-size:12px;color:#333;font-family:"Meiryo","メイリオ",sans-serif}
+.tm-bm-header{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:linear-gradient(180deg,#5a9fd4 0%,#3a7fc1 100%);color:#fff;border-radius:8px 8px 0 0}
+.tm-bm-title{font-weight:bold;font-size:13px}
+.tm-bm-toggle{border:none;background:rgba(255,255,255,.25);color:#fff;width:22px;height:22px;border-radius:4px;cursor:pointer;font-size:14px;line-height:1}
+.tm-bm-body{padding:10px 12px;display:flex;flex-direction:column;gap:4px;max-height:70vh;overflow:auto}
+.tm-bm-label{font-weight:bold;color:#556;margin-top:4px}
+.tm-bm-input{width:100%;box-sizing:border-box;padding:5px 6px;border:1px solid #ccc;border-radius:4px;font-size:12px;font-family:inherit}
+.tm-bm-textarea{resize:vertical;min-height:48px}
+.tm-bm-num{width:90px}
+.tm-bm-target{margin-top:6px;font-weight:bold;color:#3a7fc1}
+.tm-bm-note{color:#999;font-size:11px;line-height:1.4;margin-top:2px}
+.tm-bm-apply{margin-top:8px;padding:8px;border:none;border-radius:4px;background:#e8883a;color:#fff;font-size:13px;cursor:pointer}
+.tm-bm-result{margin-top:6px;font-size:11px;line-height:1.5;min-height:1em;color:#2a7d2a}
+</style>
+</head>
+<body>
+<div class="header">
+  <span class="logo">SALON BOARD</span>
+  <span style="font-size:11px;opacity:0.85;">ビューティーサロン デモ店</span>
+</div>
+<div class="nav">
+  <a>予約管理</a><a>顧客管理</a><a class="active">掲載管理</a><a>メッセージ</a><a>分析</a>
+</div>
+
+<div class="contents">
+  <div class="page-title">フォトギャラリー掲載情報編集</div>
+  <table class="gtable" id="gtable">
+    <thead><tr><th>No.</th><th>画像</th><th>タイトル</th><th>キャプション</th><th>クーポン</th></tr></thead>
+    <tbody id="gbody"></tbody>
+  </table>
+</div>
+
+<!-- ===== 一括設定パネル（ユーザースクリプトが挿入する UI を再現・ダミーデータ） ===== -->
+<div class="tm-bm-panel">
+  <div class="tm-bm-header">
+    <span class="tm-bm-title">📋 メタ情報 一括設定</span>
+    <button class="tm-bm-toggle">−</button>
+  </div>
+  <div class="tm-bm-body">
+    <label class="tm-bm-label">タイトル</label>
+    <input class="tm-bm-input" type="text" value="新作デザイン">
+    <label class="tm-bm-label">キャプション</label>
+    <textarea class="tm-bm-input tm-bm-textarea">(渋谷/長さだし/ニュアンスネイル/マグネット)</textarea>
+    <label class="tm-bm-label">クーポン</label>
+    <select class="tm-bm-input">
+      <option>【定額】ニュアンスネイル ¥8,800</option>
+      <option>（変更しない）</option>
+      <option>【定額】ワンカラー ¥6,600</option>
+    </select>
+    <label class="tm-bm-label">開始No.（掲載順）</label>
+    <input class="tm-bm-input tm-bm-num" type="number" value="33">
+    <div class="tm-bm-target">未入力の行 30 件に適用</div>
+    <div class="tm-bm-note">※ 対象は「タイトルが空」の行のみ。No.は既存の番号と重複し得ます。保存は手動です。</div>
+    <button class="tm-bm-apply">この内容で一括適用</button>
+    <div class="tm-bm-result">30件に適用しました（No. 33〜62）。内容を確認して、サロンボードの保存ボタンで登録してください。</div>
+  </div>
+</div>
+
+<script>
+// ダミーのギャラリー行を生成（実サロン情報は使わない）
+const colors = ['#f0a0c0','#a0c0f0','#a0e0c0','#f0d0a0','#c0a0e0','#a0e0e0'];
+const filled = [
+  { no: 1, title: 'メニュー｜定額コース', cap: '当店人気の定額メニュー', coupon: '【定額】ニュアンスネイル ¥8,800' },
+  { no: 2, title: 'メニュー｜長さだし', cap: 'スカルプ・長さだし対応', coupon: '—' },
+];
+const body = document.getElementById('gbody');
+filled.forEach((r, i) => {
+  const tr = document.createElement('tr');
+  tr.innerHTML =
+    '<td class="no"><input type="text" class="no" value="' + r.no + '"></td>' +
+    '<td><div class="thumb" style="background:' + colors[i % colors.length] + '">SAMPLE</div></td>' +
+    '<td><input type="text" value="' + r.title + '"></td>' +
+    '<td><textarea>' + r.cap + '</textarea></td>' +
+    '<td>' + r.coupon + '</td>';
+  body.appendChild(tr);
+});
+// 未入力（新規追加）行：タイトル空・高いNoが振られている状態
+for (let k = 0; k < 3; k++) {
+  const tr = document.createElement('tr');
+  tr.className = 'empty-row';
+  tr.innerHTML =
+    '<td class="no"><input type="text" class="no" value="' + (121 + k) + '"></td>' +
+    '<td><div class="thumb" style="background:' + colors[(k + 2) % colors.length] + '">NEW</div></td>' +
+    '<td><input type="text" value=""></td>' +
+    '<td><textarea></textarea></td>' +
+    '<td>—</td>';
+  body.appendChild(tr);
+}
+const more = document.createElement('tr');
+more.innerHTML = '<td colspan="5" style="text-align:center;color:#999;">… 新規追加分 計30件（No.121〜150・タイトル未入力）…</td>';
+body.appendChild(more);
+</script>
+</body>
+</html>

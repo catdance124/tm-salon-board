@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>サロンボード - フォトギャラリー掲載情報編集</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Meiryo", "メイリオ", sans-serif; font-size: 12px; background: #f0f4f8; color: #333; }
+.header { background: linear-gradient(180deg, #5a9fd4 0%, #3a7fc1 100%); color: #fff; padding: 6px 12px; display: flex; align-items: center; gap: 16px; }
+.header .logo { font-size: 18px; font-weight: bold; letter-spacing: 1px; }
+.nav { background: #3a7fc1; display: flex; gap: 2px; padding: 0 8px; }
+.nav a { color: #fff; padding: 8px 14px; font-size: 12px; text-decoration: none; display: block; }
+.nav a:hover, .nav a.active { background: #2a6aaa; }
+.contents { padding: 12px; }
+.page-title { font-size: 15px; font-weight: bold; border-left: 4px solid #3a7fc1; padding-left: 8px; margin-bottom: 12px; }
+.gallery { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; max-width: 760px; }
+.photo-card { border: 1px solid #c8d8e8; border-radius: 4px; background: #fff; padding: 8px; }
+.photo-card .thumb { width: 100%; aspect-ratio: 4/3; border-radius: 3px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; }
+.photo-card .ops { display: flex; gap: 6px; margin-top: 6px; }
+.photo-card .ops button { flex: 1; font-size: 10px; padding: 3px; border: 1px solid #aac8e8; background: #eef4fb; color: #3a7fc1; border-radius: 3px; cursor: pointer; }
+.photo-card .ops button.edit { background: #5a9fd4; color: #fff; border-color: #5a9fd4; }
+
+/* ===== 以下、ユーザースクリプトの編集モーダル CSS（実物と同一） ===== */
+.tm-pe-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100000;display:flex;align-items:center;justify-content:center;font-size:13px;color:#333}
+.tm-pe-dialog{background:#fff;border-radius:8px;width:min(880px,94vw);max-height:92vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,.35);overflow:hidden}
+.tm-pe-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #e5e5e5}
+.tm-pe-title{font-weight:bold;font-size:15px}
+.tm-pe-x{border:none;background:none;font-size:22px;line-height:1;cursor:pointer;color:#888;padding:0 4px}
+.tm-pe-x:hover{color:#333}
+.tm-pe-toolbar{padding:10px 16px;border-bottom:1px solid #eee;display:flex;flex-direction:column;gap:8px}
+.tm-pe-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.tm-pe-label{min-width:54px;color:#667;font-weight:bold}
+.tm-pe-tab{padding:5px 14px;border:1px solid #5a9fd4;background:#fff;color:#5a9fd4;border-radius:4px;cursor:pointer;font-size:13px}
+.tm-pe-tab.is-active{background:#5a9fd4;color:#fff}
+.tm-pe-chip{padding:4px 10px;border:1px solid #ccc;background:#fff;color:#555;border-radius:14px;cursor:pointer;font-size:12px}
+.tm-pe-chip.is-active{border-color:#5a9fd4;background:#eef4fb;color:#3a7fb4;font-weight:bold}
+.tm-pe-color{width:36px;height:24px;border:1px solid #ccc;border-radius:4px;cursor:pointer;padding:0;background:#fff}
+.tm-pe-swatch{width:22px;height:22px;border:1px solid #ccc;border-radius:4px;cursor:pointer}
+.tm-pe-slider{display:flex;align-items:center;gap:4px}
+.tm-pe-slider-lbl{color:#778;width:14px;text-align:center}
+.tm-pe-slider input[type=range]{width:80px}
+.tm-pe-slider-val{width:22px;text-align:right;color:#556;font-variant-numeric:tabular-nums}
+.tm-pe-body{flex:1;min-height:0;background:#f4f4f4;display:flex;align-items:center;justify-content:center;padding:14px;overflow:auto}
+.tm-pe-padwrap{display:flex;align-items:center;justify-content:center;max-height:60vh;max-width:100%}
+.tm-pe-padcanvas{max-width:100%;max-height:60vh;box-shadow:0 0 0 1px #ddd, 0 2px 8px rgba(0,0,0,.15)}
+.tm-pe-footer{display:flex;align-items:center;gap:10px;padding:12px 16px;border-top:1px solid #e5e5e5}
+.tm-pe-hint{flex:1;color:#999;font-size:12px}
+.tm-pe-btn{padding:8px 16px;border-radius:4px;cursor:pointer;font-size:13px;border:1px solid transparent}
+.tm-pe-btn-ghost{background:#fff;border-color:#ccc;color:#666}
+.tm-pe-btn-primary{background:#e8883a;color:#fff}
+</style>
+</head>
+<body>
+<div class="header">
+  <span class="logo">SALON BOARD</span>
+  <span style="font-size:11px;opacity:0.85;">ビューティーサロン デモ店</span>
+</div>
+<div class="nav">
+  <a>予約管理</a><a>顧客管理</a><a class="active">掲載管理</a><a>メッセージ</a><a>分析</a>
+</div>
+
+<div class="contents">
+  <div class="page-title">フォトギャラリー掲載情報編集</div>
+  <div class="gallery" id="gallery"></div>
+</div>
+
+<!-- ===== 編集モーダル（ユーザースクリプトが挿入する UI を再現） ===== -->
+<div class="tm-pe-overlay">
+  <div class="tm-pe-dialog">
+    <div class="tm-pe-header">
+      <span class="tm-pe-title">画像を編集してからアップロード</span>
+      <button class="tm-pe-x" title="編集せず閉じる（元画像のまま）">×</button>
+    </div>
+    <div class="tm-pe-toolbar">
+      <div class="tm-pe-row">
+        <span class="tm-pe-label">モード</span>
+        <button class="tm-pe-tab is-active">余白を追加</button>
+        <button class="tm-pe-tab">切り抜き</button>
+      </div>
+      <div class="tm-pe-row">
+        <span class="tm-pe-label">比率</span>
+        <button class="tm-pe-chip is-active">4:3</button>
+        <button class="tm-pe-chip">3:4</button>
+        <button class="tm-pe-chip">1:1</button>
+        <button class="tm-pe-chip">16:9</button>
+        <button class="tm-pe-chip">自由</button>
+      </div>
+      <div class="tm-pe-row">
+        <span class="tm-pe-label">余白の色</span>
+        <input class="tm-pe-color" type="color" value="#ffffff">
+        <button class="tm-pe-swatch" style="background:#ffffff"></button>
+        <button class="tm-pe-swatch" style="background:#000000"></button>
+      </div>
+      <div class="tm-pe-row">
+        <span class="tm-pe-label">余白(%)</span>
+        <label class="tm-pe-slider"><span class="tm-pe-slider-lbl">上</span><input type="range" min="0" max="50" value="0"><span class="tm-pe-slider-val">0</span></label>
+        <label class="tm-pe-slider"><span class="tm-pe-slider-lbl">下</span><input type="range" min="0" max="50" value="0"><span class="tm-pe-slider-val">0</span></label>
+        <label class="tm-pe-slider"><span class="tm-pe-slider-lbl">左</span><input type="range" min="0" max="50" value="0"><span class="tm-pe-slider-val">0</span></label>
+        <label class="tm-pe-slider"><span class="tm-pe-slider-lbl">右</span><input type="range" min="0" max="50" value="0"><span class="tm-pe-slider-val">0</span></label>
+      </div>
+    </div>
+    <div class="tm-pe-body">
+      <div class="tm-pe-padwrap"><canvas class="tm-pe-padcanvas" id="padCanvas"></canvas></div>
+    </div>
+    <div class="tm-pe-footer">
+      <span class="tm-pe-hint">お客様一覧は 4:3 横長で表示されます</span>
+      <button class="tm-pe-btn tm-pe-btn-ghost">キャンセル（元画像のまま）</button>
+      <button class="tm-pe-btn tm-pe-btn-primary">この内容でアップロード</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ダミーの縦長ネイル写真を生成（実サロンの画像は使わない）
+function makePortrait() {
+  const c = document.createElement('canvas');
+  c.width = 600; c.height = 900;
+  const ctx = c.getContext('2d');
+  const g = ctx.createLinearGradient(0, 0, 0, 900);
+  g.addColorStop(0, '#e8a0d0'); g.addColorStop(1, '#9fd8b0');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, 600, 900);
+  ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = 6;
+  ctx.strokeRect(24, 24, 552, 852);
+  ctx.fillStyle = 'rgba(255,255,255,.95)'; ctx.font = 'bold 34px sans-serif';
+  ctx.textAlign = 'center'; ctx.fillText('NAIL SAMPLE', 300, 460);
+  ctx.font = '24px sans-serif'; ctx.fillText('600 × 900（縦長）', 300, 500);
+  return c;
+}
+
+// 余白追加（contain 配置）で 4:3 に収める：実スクリプトの buildPadCanvas と同じ考え方
+const portrait = makePortrait();
+const iw = portrait.width, ih = portrait.height;
+const aspect = 4 / 3;
+let finalW = iw, finalH = ih;
+if (iw / ih < aspect) finalW = ih * aspect; else finalH = iw / aspect;
+const out = document.getElementById('padCanvas');
+out.width = finalW; out.height = finalH;
+const octx = out.getContext('2d');
+octx.fillStyle = '#ffffff'; octx.fillRect(0, 0, finalW, finalH);
+octx.drawImage(portrait, (finalW - iw) / 2, (finalH - ih) / 2, iw, ih);
+
+// 背景のダミーギャラリー
+const colors = ['#f0a0c0','#a0c0f0','#a0e0c0','#f0d0a0','#c0a0e0','#a0e0e0','#e0c0a0','#c0e0a0'];
+const labels = ['フィルイン','ワンホン','ニュアンス','マグネット','フレンチ','ミラー','押し花','ガーリー'];
+const g = document.getElementById('gallery');
+for (let i = 0; i < 8; i++) {
+  const card = document.createElement('div');
+  card.className = 'photo-card';
+  card.innerHTML = '<div class="thumb" style="background:' + colors[i] + '">' + labels[i] + 'ネイル</div>' +
+    '<div class="ops"><button class="edit">編集</button><button>アップロード</button><button>削除</button></div>';
+  g.appendChild(card);
+}
+</script>
+</body>
+</html>
