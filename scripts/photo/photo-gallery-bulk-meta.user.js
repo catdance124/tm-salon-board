@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         サロンボード フォトギャラリー メタ情報一括設定
 // @namespace    https://github.com/catdance124/tm-salon-board
-// @version      1.0.0
-// @description  フォトギャラリー編集画面で、未入力の行にタイトル・キャプション・クーポンを一括設定し、No.（掲載順）を指定開始番号から連番に振り直す
+// @version      1.1.0
+// @description  フォトギャラリー編集画面で、未入力の行にタイトル・キャプション・クーポンを一括設定し、No.（掲載順）を指定開始番号から逆順（下の行ほど小さい番号）の連番で振り直す
 // @author       catdance124
 // @match        https://salonboard.com/CNK/draft/photoGalleryEdit*
 // @grant        none
@@ -126,8 +126,8 @@
     // クーポンのソース行（その couponId を持つ既存行）を一度だけ解決
     const couponSource = opts.couponId ? collectCoupons().get(opts.couponId)?.sourceIndex : undefined;
     targets.forEach((row, k) => {
-      // No.（掲載順）
-      setInputValue(row.sortInput, String(start + k));
+      // No.（掲載順）: 逆順で振る（一番下の行が開始No.、上の行ほど大きい番号）
+      setInputValue(row.sortInput, String(start + (targets.length - 1 - k)));
       // タイトル / キャプション（指定があれば設定。対象は元々空なので上書き問題なし）
       if (opts.title) setInputValue(row.titleInput, opts.title);
       if (opts.caption) setInputValue(row.captionInput, opts.caption);
@@ -195,7 +195,7 @@
     bodyWrap.appendChild(couponSelect);
 
     // 開始No.
-    bodyWrap.appendChild(textEl('label', 'tm-bm-label', '開始No.（掲載順）'));
+    bodyWrap.appendChild(textEl('label', 'tm-bm-label', '開始No.（掲載順・一番下の行に付与）'));
     const startInput = el('input', 'tm-bm-input tm-bm-num');
     startInput.type = 'number';
     startInput.min = '1';
