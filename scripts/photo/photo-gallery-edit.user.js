@@ -1,10 +1,10 @@
 // ==UserScript==
-// @name         サロンボード フォトギャラリー画像編集
+// @name         サロンボード 画像アップロード編集（トリミング・余白追加）
 // @namespace    https://github.com/catdance124/tm-salon-board
-// @version      1.1.0
-// @description  フォト投稿時にトリミング・余白追加（アスペクト比調整）ができる編集画面を追加。既存写真の編集・再アップロードにも対応
+// @version      1.2.0
+// @description  画像アップロード時にトリミング・余白追加（アスペクト比調整）ができる編集画面を追加。フォトギャラリー・クーポン編集など、共通の画像アップローダーを使う画面全般で動作。フォトギャラリーは既存写真の編集・再アップロードにも対応
 // @author       catdance124
-// @match        https://salonboard.com/CNK/draft/photoGalleryEdit*
+// @match        https://salonboard.com/CNK/draft/*
 // @require      https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js
 // @grant        none
 // @run-at       document-idle
@@ -268,7 +268,7 @@
 
     // フッタ
     const footer = el('div', 'tm-pe-footer');
-    footer.appendChild(textEl('span', 'tm-pe-hint', 'お客様一覧は 4:3 横長で表示されます'));
+    footer.appendChild(textEl('span', 'tm-pe-hint', '表示エリアの比率に合わせて切り抜き・余白追加ができます'));
     const cancelBtn = textEl('button', 'tm-pe-btn tm-pe-btn-ghost', 'キャンセル（元画像のまま）');
     const applyBtn = textEl('button', 'tm-pe-btn tm-pe-btn-primary', 'この内容でアップロード');
     footer.appendChild(cancelBtn);
