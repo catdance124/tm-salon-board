@@ -25,7 +25,7 @@
 | スケジュール | [スケジュール 週表示](#スケジュール-週表示) | スケジュール画面に7日分の週表示パネルを追加 | [![Install](https://img.shields.io/badge/install-green)](https://raw.githubusercontent.com/catdance124/tm-salon-board/main/scripts/schedule/schedule-week-view.user.js) |
 | シフト | [シフトセル インライン編集](#シフトセル-インライン編集) | シフト設定画面の各セルをプルダウンで直接変更 | [![Install](https://img.shields.io/badge/install-green)](https://raw.githubusercontent.com/catdance124/tm-salon-board/main/scripts/shift/shift-inline-edit.user.js) |
 | クーポン | [クーポンリスト強化](#クーポンリスト強化) | クーポン一覧にコピー・インライン詳細表示・並べ替えを追加 | [![Install](https://img.shields.io/badge/install-green)](https://raw.githubusercontent.com/catdance124/tm-salon-board/main/scripts/coupon/coupon-list-enhance.user.js) |
-| フォト | [フォトギャラリー画像編集](#フォトギャラリー画像編集) | フォト投稿時にトリミング・余白追加（アスペクト比調整）ができる編集画面を追加 | [![Install](https://img.shields.io/badge/install-green)](https://raw.githubusercontent.com/catdance124/tm-salon-board/main/scripts/photo/photo-gallery-edit.user.js) |
+| フォト | [画像アップロード編集（トリミング・余白追加）](#画像アップロード編集トリミング余白追加) | フォトギャラリーやクーポン編集など画像アップロード時にトリミング・余白追加（アスペクト比調整）ができる編集画面を追加 | [![Install](https://img.shields.io/badge/install-green)](https://raw.githubusercontent.com/catdance124/tm-salon-board/main/scripts/photo/photo-gallery-edit.user.js) |
 | フォト | [フォトギャラリー メタ情報一括設定](#フォトギャラリー-メタ情報一括設定) | 未入力の行にタイトル・キャプション・クーポンを一括設定し、No.（掲載順）を指定開始番号から連番に振り直す | [![Install](https://img.shields.io/badge/install-green)](https://raw.githubusercontent.com/catdance124/tm-salon-board/main/scripts/photo/photo-gallery-bulk-meta.user.js) |
 
 ---
@@ -84,10 +84,10 @@
 
 ### フォト
 
-#### フォトギャラリー画像編集
+#### 画像アップロード編集（トリミング・余白追加）
 [![Install](https://img.shields.io/badge/TamperMonkey-Install-green)](https://raw.githubusercontent.com/catdance124/tm-salon-board/main/scripts/photo/photo-gallery-edit.user.js)
 
-フォトギャラリーに写真をアップロードする際、画面上でトリミング・余白追加（アスペクト比の調整）ができる編集画面を自動表示する。お客様用一覧は 4:3 横長で表示されるため、縦長画像でも余白を付けてきれいに収められる。すでに登録済みの写真も「編集」ボタンから同じ編集画面で直して上書き再アップロードできる。
+フォトギャラリー・クーポン編集など、共通の画像アップローダーを使う画面で、画像をアップロードする際に画面上でトリミング・余白追加（アスペクト比の調整）ができる編集画面を自動表示する。お客様用一覧は 4:3 横長で表示されるため、縦長画像でも余白を付けてきれいに収められる。フォトギャラリーではすでに登録済みの写真も「編集」ボタンから同じ編集画面で直して上書き再アップロードできる。
 
 ![フォトギャラリー画像編集](docs/screenshots/photo-gallery-edit.png)
 
